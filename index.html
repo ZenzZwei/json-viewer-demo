@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Viewer - GitHub Pages Demo</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-dark: #1e293b;
+            --bg-card: #ffffff;
+            --bg-page: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #334155 100%);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 0;
+            border-left: 1px solid #475569;
+            padding-left: 15px;
+        }
+
+        .header .badge {
+            background: var(--primary);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .container {
+            width: 98%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 16px;
+            height: 16px;
+            color: white;
+        }
+
+        .feature-text h3 {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .feature-text p {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .tool-section {
+            background: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .tool-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 70vh;
+            min-height: 500px;
+        }
+
+        @media (max-width: 768px) {
+            .tool-body {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-panel, .output-panel {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .input-panel {
+            border-right: 1px solid var(--border);
+        }
+
+        .output-panel {
+            background: #f8fafc;
+        }
+
+        .input-panel textarea {
+            width: 100%;
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            resize: none;
+            transition: border-color 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .output-content {
+            background: var(--bg-dark);
+            border-radius: 6px;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            overflow: auto;
+            white-space: pre-wrap;
+            flex: 1;
+            margin-bottom: 15px;
+        }
+
+        .bottom-actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(110%); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            filter: brightness(100%);
+        }
+
+        .btn-secondary {
+            background: var(--bg-page);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(0);
+            background: #cbd5e1;
+        }
+
+        .input-panel textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .output-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .output-panel h3 {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .output-content .key { color: #93c5fd; }
+        .output-content .string { color: #86efac; }
+        .output-content .number { color: #fca5a5; }
+        .output-content .boolean { color: #fdba74; }
+        .output-content .null { color: #a5b4fc; }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: none;
+        }
+        .status.success { background: #dcfce7; color: #166534; display: block; }
+        .status.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+        }
+        .footer a { color: var(--primary); text-decoration: none; }
+
+        .sample-buttons {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .sample-btn {
+            padding: 4px 10px;
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sample-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-page); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>JSON Viewer</h1>
+            <p>GitHub Pages Demo</p>
+        </div>
+        <span class="badge">v1.2.0</span>
+    </div>
+
+    <div class="container">
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                </div>
+                <div class="feature-text">
+                    <h3>Parse & Validate</h3>
+                    <p>Error detection</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 7 4 4 20 4 20 7"/>
+                        <line x1="9" y1="20" x2="15" y2="20"/>
+                        <line x1="12" y1="4" x2="12" y2="20"/>
+                    </svg>
+                </div>
+                <div class="feature-text">
+                    <h3>Format & Beautify</h3>
+                    <p>Syntax highlighting</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
+                <div class="feature-text">
+                    <h3>Analyze</h3>
+                    <p>Data structure stats</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <div class="tool-body">
+                <div class="input-panel">
+                    <div class="sample-buttons">
+                        <span style="font-size: 11px; color: var(--text-secondary); margin-right: 4px;">Samples:</span>
+                        <button class="sample-btn" onclick="loadSample('user')">User</button>
+                        <button class="sample-btn" onclick="loadSample('products')">Products</button>
+                        <button class="sample-btn" onclick="loadSample('nested')">Nested</button>
+                    </div>
+                    
+                    <textarea id="jsonInput" placeholder="Paste your JSON here..."></textarea>
+                    
+                    <div class="bottom-actions">
+                        <div class="status" id="status"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="parseJSON()">Format</button>
+                            <button class="btn btn-secondary" onclick="sortJSON()">Sort Keys</button>
+                            <button class="btn btn-secondary" onclick="removeNulls()">No Nulls</button>
+                            <button class="btn btn-secondary" onclick="minifyJSON()">Minify</button>
+                            <button class="btn btn-secondary" onclick="escapeJSON()">Escape</button>
+                            <button class="btn btn-secondary" onclick="unescapeJSON()">Unescape</button>
+                            <button class="btn btn-secondary" onclick="downloadJSON()">Download</button>
+                            <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="output-panel">
+                    <div class="output-header-row">
+                        <h3>Output</h3>
+                        <div class="stats" id="stats" style="display: none;">
+                            <div class="stat-item">
+                                <span class="stat-value" id="statKeys">0</span>
+                                <span class="stat-label">Keys</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="statDepth">0</span>
+                                <span class="stat-label">Depth</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="statSize">0</span>
+                                <span class="stat-label">B</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="output-content" id="output">
+                        <span style="color: #64748b;">// Output will appear here</span>
+                    </div>
+                    
+                    <div class="bottom-actions">
+                        <button class="btn btn-primary" style="padding: 10px 24px; font-size: 15px; font-weight: 600; width: 100%;" onclick="copyOutput()">Copy Result</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Built for GitHub Pages Test</p>
+    </div>
+
+    <script>
+        const samples = {
+            user: {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john@example.com",
+                "active": true,
+                "roles": ["admin", "editor"],
+                "profile": {
+                    "avatar": "https://example.com/avatar.jpg",
+                    "bio": "Software Developer"
+                }
+            },
+            products: [
+                { "id": 1, "name": "Laptop", "price": 999.99, "inStock": true },
+                { "id": 2, "name": "Mouse", "price": 29.99, "inStock": true },
+                { "id": 3, "name": "Keyboard", "price": 79.99, "inStock": false }
+            ],
+            nested: {
+                "company": "Tech Corp",
+                "departments": {
+                    "engineering": {
+                        "teams": {
+                            "frontend": { "members": 5, "tech": ["React", "Vue"] },
+                            "backend": { "members": 8, "tech": ["Node", "Python"] }
+                        }
+                    },
+                    "design": {
+                        "teams": {
+                            "ui": { "members": 3 },
+                            "ux": { "members": 2 }
+                        }
+                    }
+                }
+            }
+        };
+
+        function loadSample(type) {
+            document.getElementById('jsonInput').value = JSON.stringify(samples[type], null, 2);
+            parseJSON();
+        }
+
+        function parseJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+            const output = document.getElementById('output');
+            const status = document.getElementById('status');
+            const stats = document.getElementById('stats');
+
+            if (!input) {
+                showStatus('Please enter some JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const formatted = syntaxHighlight(JSON.stringify(parsed, null, 2));
+                output.innerHTML = formatted;
+
+                const keyCount = countKeys(parsed);
+                const depth = getDepth(parsed);
+                const size = new Blob([input]).size;
+
+                document.getElementById('statKeys').textContent = keyCount;
+                document.getElementById('statDepth').textContent = depth;
+                document.getElementById('statSize').textContent = size;
+                stats.style.display = 'flex';
+
+                showStatus('JSON parsed successfully!', 'success');
+            } catch (e) {
+                output.innerHTML = `<span style="color: #ef4444;">Error: ${e.message}</span>`;
+                stats.style.display = 'none';
+                showStatus(`Parse error: ${e.message}`, 'error');
+            }
+        }
+
+        function sortJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+            if (!input) {
+                showStatus('Please enter some JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                
+                const sortObject = (obj) => {
+                    if (typeof obj !== 'object' || obj === null) return obj;
+                    if (Array.isArray(obj)) return obj.map(sortObject);
+                    return Object.keys(obj).sort().reduce((result, key) => {
+                        result[key] = sortObject(obj[key]);
+                        return result;
+                    }, {});
+                };
+
+                const sorted = sortObject(parsed);
+                const formatted = syntaxHighlight(JSON.stringify(sorted, null, 2));
+                document.getElementById('output').innerHTML = formatted;
+                
+                document.getElementById('statKeys').textContent = countKeys(sorted);
+                document.getElementById('stats').style.display = 'flex';
+                
+                showStatus('JSON keys sorted!', 'success');
+            } catch (e) {
+                showStatus('Sort error: ' + e.message, 'error');
+            }
+        }
+
+        function removeNulls() {
+            const input = document.getElementById('jsonInput').value.trim();
+            if (!input) {
+                showStatus('Please enter some JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+
+                const clean = (obj) => {
+                    if (Array.isArray(obj)) {
+                        return obj.map(v => clean(v)).filter(v => v !== null);
+                    } else if (typeof obj === 'object' && obj !== null) {
+                        return Object.entries(obj).reduce((acc, [key, value]) => {
+                            if (value !== null) {
+                                acc[key] = clean(value);
+                            }
+                            return acc;
+                        }, {});
+                    }
+                    return obj;
+                };
+
+                const cleaned = clean(parsed);
+                const formatted = syntaxHighlight(JSON.stringify(cleaned, null, 2));
+                document.getElementById('output').innerHTML = formatted;
+                
+                document.getElementById('statKeys').textContent = countKeys(cleaned);
+                document.getElementById('stats').style.display = 'flex';
+                
+                showStatus('Null values removed!', 'success');
+            } catch (e) {
+                showStatus('Error: ' + e.message, 'error');
+            }
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function minifyJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+            const output = document.getElementById('output');
+            const stats = document.getElementById('stats');
+
+            if (!input) {
+                showStatus('Please enter some JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const minified = JSON.stringify(parsed);
+                output.textContent = minified;
+                stats.style.display = 'none';
+                showStatus('JSON minified successfully!', 'success');
+            } catch (e) {
+                output.innerHTML = `<span style="color: #ef4444;">Error: ${e.message}</span>`;
+                stats.style.display = 'none';
+                showStatus(`Minify error: ${e.message}`, 'error');
+            }
+        }
+
+        function escapeJSON() {
+            const input = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            const stats = document.getElementById('stats');
+
+            if (!input) {
+                showStatus('Please enter some text to escape', 'error');
+                return;
+            }
+
+            const escaped = input.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+            output.textContent = escaped;
+            stats.style.display = 'none';
+            showStatus('JSON escaped successfully!', 'success');
+        }
+
+        function unescapeJSON() {
+            const input = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            const stats = document.getElementById('stats');
+
+            if (!input) {
+                showStatus('Please enter some text to unescape', 'error');
+                return;
+            }
+
+            const unescaped = input.replace(/\\"/g, '"').replace(/\\n/g, '\n');
+            output.textContent = unescaped;
+            stats.style.display = 'none';
+            showStatus('JSON unescaped successfully!', 'success');
+        }
+
+        function downloadJSON() {
+            const content = document.getElementById('output').innerText;
+            if (content.includes("// Output will appear here")) {
+                showStatus('Nothing to download', 'error');
+                return;
+            }
+
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus('Download started!', 'success');
+        }
+
+        function countKeys(obj) {
+            let count = 0;
+            function traverse(o) {
+                if (typeof o === 'object' && o !== null) {
+                    if (Array.isArray(o)) {
+                        o.forEach(traverse);
+                    } else {
+                        count += Object.keys(o).length;
+                        Object.values(o).forEach(traverse);
+                    }
+                }
+            }
+            traverse(obj);
+            return count;
+        }
+
+        function getDepth(obj) {
+            if (typeof obj !== 'object' || obj === null) return 0;
+            let maxDepth = 0;
+            for (const key in obj) {
+                const depth = getDepth(obj[key]);
+                if (depth > maxDepth) maxDepth = depth;
+            }
+            return maxDepth + 1;
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('output').innerHTML = '<span style="color: #64748b;">// Output will appear here</span>';
+            document.getElementById('status').style.display = 'none';
+            document.getElementById('stats').style.display = 'none';
+        }
+
+        function copyOutput() {
+            const content = document.getElementById('output').innerText;
+            if (content.includes("// Output will appear here")) {
+                 showStatus('Nothing to copy', 'error');
+                 return;
+            }
+            navigator.clipboard.writeText(content).then(() => {
+                showStatus('Copied to clipboard!', 'success');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSample('user');
+        });
+    </script>
+</body>
+</html>
